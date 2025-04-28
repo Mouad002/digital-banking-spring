@@ -11,10 +11,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "TYPE", length = 4)
+@Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class BankAccount {
     @Id
     private String id;
