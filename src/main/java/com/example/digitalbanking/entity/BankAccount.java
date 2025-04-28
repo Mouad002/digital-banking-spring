@@ -19,10 +19,10 @@ public class BankAccount {
     private String id;
     private Date createAt;
     private double balance;
-    private AccountStatus tatus;
+    private AccountStatus status;
     private String currency;
     @ManyToOne
     private Customer customer;
     @OneToMany(mappedBy = "bankAccount")
-    private List<Operation> operation;
+    private List<AccountOperation> accountOperation;
 }
