@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-//@DiscriminatorColumn(name = "TYPE", length = 4)
-@Data @AllArgsConstructor @NoArgsConstructor
-public abstract class BankAccount {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "TYPE", length = 4)
+@Data @Builder @AllArgsConstructor @NoArgsConstructor
+public class BankAccount {
     @Id
     private String id;
     private Date createAt;
@@ -24,6 +24,6 @@ public abstract class BankAccount {
     private String currency;
     @ManyToOne
     private Customer customer;
-    @OneToMany(mappedBy = "bankAccount")
-    private List<AccountOperation> accountOperation;
+    @OneToMany(mappedBy = "bankAccount", fetch = FetchType.EAGER)
+    private List<AccountOperation> accountOperations;
 }

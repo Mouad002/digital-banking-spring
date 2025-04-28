@@ -1,9 +1,6 @@
 package com.example.digitalbanking;
 
-import com.example.digitalbanking.entity.AccountOperation;
-import com.example.digitalbanking.entity.CurrentAccount;
-import com.example.digitalbanking.entity.Customer;
-import com.example.digitalbanking.entity.SavingAccount;
+import com.example.digitalbanking.entity.*;
 import com.example.digitalbanking.enums.AccountStatus;
 import com.example.digitalbanking.enums.OperationType;
 import com.example.digitalbanking.repositories.AccountOperationRepository;
@@ -26,6 +23,30 @@ public class DigitalBankingApplication {
 	}
 
 	@Bean
+	public CommandLineRunner commandLineRunner(BankAccountRepository bankAccountRepository) {
+		return args -> {
+			BankAccount bankAccount = bankAccountRepository.findById("319b80a9-552e-4e88-b999-a483368114ce").orElse(null);
+			if(bankAccount != null) {
+				System.out.println("*****************************");
+				System.out.println(bankAccount.getId());
+				System.out.println(bankAccount.getBalance());
+				System.out.println(bankAccount.getStatus());
+				System.out.println(bankAccount.getCreateAt());
+				System.out.println(bankAccount.getCustomer().getName());
+				System.out.println(bankAccount.getClass().getSimpleName());
+				if(bankAccount instanceof CurrentAccount) {
+					System.out.println("over draft => "+((CurrentAccount)bankAccount).getOverDraft());
+				} else if(bankAccount instanceof SavingAccount) {
+					System.out.println("rate => "+((SavingAccount)bankAccount).getInterestRate());
+				}
+				bankAccount.getAccountOperations().forEach(operation -> {
+					System.out.println("==========================");
+					System.out.println(operation.getType() + "\t" + operation.getDate() + "\t" + operation.getAmount());
+				});
+			}
+		};
+	}
+//	@Bean
 	public CommandLineRunner start(CustomerRepository customerRepository,
 								   BankAccountRepository bankAccountRepository,
 								   AccountOperationRepository accountOperationRepository) {
@@ -66,8 +87,8 @@ public class DigitalBankingApplication {
 						accountOperation.setBankAccount(acc);
 						accountOperationRepository.save(accountOperation);
 					}
-
 				});
+
 			});
 		};
 	}
