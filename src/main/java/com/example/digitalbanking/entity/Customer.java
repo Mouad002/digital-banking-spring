@@ -1,6 +1,7 @@
 package com.example.digitalbanking.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +20,6 @@ public class Customer {
     private String name;
     private String email;
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<BankAccount> accounts;
 }

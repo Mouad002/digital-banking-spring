@@ -1,5 +1,6 @@
 package com.example.digitalbanking;
 
+import com.example.digitalbanking.dtos.CustomerDTO;
 import com.example.digitalbanking.entity.*;
 import com.example.digitalbanking.enums.AccountStatus;
 import com.example.digitalbanking.enums.OperationType;
@@ -102,7 +103,7 @@ public class DigitalBankingApplication {
 	CommandLineRunner runner(BankAccountService bankAccountService) {
 		return args -> {
 			Stream.of("hassan", "iman", "mohammed").forEach(name -> {
-				Customer customer = new Customer();
+				CustomerDTO customer = new CustomerDTO();
 				customer.setName(name);
 				customer.setEmail(name+"@gmail.com");
 				bankAccountService.saveCustomer(customer);
