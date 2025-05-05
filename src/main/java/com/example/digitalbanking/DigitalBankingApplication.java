@@ -1,6 +1,9 @@
 package com.example.digitalbanking;
 
+import com.example.digitalbanking.dtos.BankAccountDTO;
+import com.example.digitalbanking.dtos.CurrentBankAccountDTO;
 import com.example.digitalbanking.dtos.CustomerDTO;
+import com.example.digitalbanking.dtos.SavingBankAccountDTO;
 import com.example.digitalbanking.entity.*;
 import com.example.digitalbanking.enums.AccountStatus;
 import com.example.digitalbanking.enums.OperationType;
@@ -40,10 +43,10 @@ public class DigitalBankingApplication {
 				System.out.println(bankAccount.getCreateAt());
 				System.out.println(bankAccount.getCustomer().getName());
 				System.out.println(bankAccount.getClass().getSimpleName());
-				if(bankAccount instanceof CurrentAccount) {
-					System.out.println("over draft => "+((CurrentAccount)bankAccount).getOverDraft());
-				} else if(bankAccount instanceof SavingAccount) {
-					System.out.println("rate => "+((SavingAccount)bankAccount).getInterestRate());
+				if(bankAccount instanceof CurrentBankAccount) {
+					System.out.println("over draft => "+((CurrentBankAccount)bankAccount).getOverDraft());
+				} else if(bankAccount instanceof SavingBankAccount) {
+					System.out.println("rate => "+((SavingBankAccount)bankAccount).getInterestRate());
 				}
 				bankAccount.getAccountOperations().forEach(operation -> {
 					System.out.println("==========================");
@@ -65,7 +68,7 @@ public class DigitalBankingApplication {
 				customerRepository.save(c1);
 
 				customerRepository.findAll().forEach(customer -> {
-					CurrentAccount ca = new CurrentAccount();
+					CurrentBankAccount ca = new CurrentBankAccount();
 					ca.setId(UUID.randomUUID().toString());
 					ca.setBalance(Math.random()*50000);
 					ca.setCreateAt(new Date());
@@ -74,7 +77,7 @@ public class DigitalBankingApplication {
 					ca.setOverDraft(7000);
 					bankAccountRepository.save(ca);
 
-					SavingAccount sa = new SavingAccount();
+					SavingBankAccount sa = new SavingBankAccount();
 					sa.setId(UUID.randomUUID().toString());
 					sa.setBalance(Math.random()*50000);
 					sa.setCreateAt(new Date());
@@ -112,17 +115,23 @@ public class DigitalBankingApplication {
                 try {
                     bankAccountService.saveCurrentBankAccount(Math.random() * 90000, 9000, customer.getId());
 					bankAccountService.saveSavingBankAccount(Math.random()*120000,5.5, customer.getId());
-					List<BankAccount> bankAccounts = bankAccountService.bankAccountList();
-					for(BankAccount bankAccount: bankAccounts) {
-						for(int i=0; i<10 ; i++) {
-							bankAccountService.credit(bankAccount.getId(), 10000 + Math.random() * 120000, "Credit");
-							bankAccountService.debit(bankAccount.getId(), 1000 + Math.random() * 9000, "Debit");
-						}
-					}
-                } catch (CustomerNotFoundException | BankAccountNotFoundException | BalanceNotSufficientException e) {
+                } catch (CustomerNotFoundException e) {
                     e.printStackTrace();
                 }
             });
+			List<BankAccountDTO> bankAccounts = bankAccountService.bankAccountList();
+			for(BankAccountDTO bankAccount: bankAccounts) {
+				for(int i=0 ; i<10 ; i++) {
+					String accountId;
+					if(bankAccount instanceof SavingBankAccountDTO){
+						accountId=((SavingBankAccountDTO) bankAccount).getId();
+					} else{
+						accountId=((CurrentBankAccountDTO) bankAccount).getId();
+					}
+					bankAccountService.credit(accountId, 10000 + Math.random() * 120000, "Credit");
+					bankAccountService.debit(accountId, 1000 + Math.random() * 9000, "Debit");
+				}
+			}
 		};
 	}
 }
