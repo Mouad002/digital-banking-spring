@@ -18,39 +18,39 @@ import java.util.List;
 public class CustomerRestController {
     private BankAccountService bankAccountService;
 
-    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_USER')")
     @GetMapping("/customers")
     public List<CustomerDTO> customers() {
         return bankAccountService.listCustomers();
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_USER')")
     @GetMapping("/customers/search")
     public List<CustomerDTO> searchCustomers(@RequestParam(name = "keyword", defaultValue = "") String search) {
         return bankAccountService.searchCustomers(search);
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_USER')")
     @GetMapping("/customers/{id}")
     public CustomerDTO getCustomer(@PathVariable(name = "id") Long id) throws CustomerNotFoundException {
         return bankAccountService.getCustomer(id);
     }
 
     @PostMapping("/customers")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO) {
         return bankAccountService.saveCustomer(customerDTO);
     }
 
     @PutMapping("/customers/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     public CustomerDTO updateCustomer(@PathVariable(name = "id") Long id, @RequestBody CustomerDTO customer) {
         customer.setId(id);
         return bankAccountService.updateCustomer(customer);
     }
 
     @DeleteMapping("/customers/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
     public void deleteCustomer(@PathVariable(name = "id") Long id) {
         bankAccountService.deleteCustomer(id);
     }

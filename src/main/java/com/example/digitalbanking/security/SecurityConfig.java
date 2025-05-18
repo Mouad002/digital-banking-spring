@@ -23,8 +23,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -37,8 +41,8 @@ public class SecurityConfig {
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         PasswordEncoder passwordEncoder = passwordEncoder();
         return new InMemoryUserDetailsManager(
-                User.withUsername("user1").password(passwordEncoder().encode("12345")).roles("USER").build(),
-                User.withUsername("user2").password(passwordEncoder().encode("12345")).roles("USER","ADMIN").build()
+                User.withUsername("user1").password(passwordEncoder.encode("12345")).roles("USER").build(),
+                User.withUsername("user2").password(passwordEncoder.encode("12345")).roles("USER","ADMIN").build()
         );
     }
 
@@ -54,8 +58,9 @@ public class SecurityConfig {
                     configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(ar ->
-                        ar.requestMatchers("/auth/login/**").permitAll()
+                        ar.requestMatchers("/auth/login/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 )
                 .authorizeHttpRequests(ar ->
                                 ar.anyRequest().authenticated()
@@ -84,6 +89,18 @@ public class SecurityConfig {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         return new ProviderManager(daoAuthenticationProvider);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration =  new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.addAllowedHeader("*");
+//        corsConfiguration.setExposedHeaders(List.of("x-auth-token"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 
 }
